@@ -53,6 +53,8 @@ public class ConsumerService extends AbstractService {
     static final ConsumerProgressSubCommand consumerProgressSubCommand = new ConsumerProgressSubCommand();
 
 
+
+
     public Collection<Option> getOptionsForConsumerProgress() {
         return getOptions(consumerProgressSubCommand);
     }
@@ -105,13 +107,12 @@ public class ConsumerService extends AbstractService {
      * @param overStackMap
      */
     private void sendStackOverMsg(Map<String,Long> overStackMap) {
-        String title = "RocketMQ消息堆积报警:";
+        String title = "RocketMQ消息堆积（阈值："+configureInitializer.getStackOverNum()+"）报警:";
         StringBuffer contentBuffer = new StringBuffer();
         for(String key : overStackMap.keySet()){
-            contentBuffer.append("\t" + key);
-            contentBuffer.append("总堆积数量：");
+            contentBuffer.append("\t主题" + key);
+            contentBuffer.append("数量：");
             contentBuffer.append(overStackMap.get(key));
-
         }
         //使用字符串的MD5值作为缓存键
         String content = title+contentBuffer.toString();
@@ -144,6 +145,10 @@ public class ConsumerService extends AbstractService {
 //    @Scheduled(fixedDelay = 30 * 60 * 1000)
     @Scheduled(fixedDelay = 10 * 1000)
     public void checkTopicStactOver(){
+        String[] checkGroups = (configureInitializer.getMonitorGroupNames() == null ? "" : configureInitializer.getMonitorGroupNames()).split(",");
+        Set checkGroupsSet = new HashSet();
+        Collections.addAll(checkGroupsSet,checkGroups);
+
         logger.info("开始检测消息堆积....");
         long start = System.currentTimeMillis();
         //查询消费者列表
@@ -163,7 +168,8 @@ public class ConsumerService extends AbstractService {
             for (int i = 0; i < size; i++) {
                 Object[] tr = table.getTbodyData().get(i);
                 //记录超出积压阀值的消费组
-                if ((StringUtils.isNotBlank((String) tr[1]) && Integer.parseInt(tr[1].toString()) > 0) && StringUtils.isNotBlank((String) tr[4]) && ((tr[6] != null && Integer.parseInt(tr[6].toString()) > configureInitializer.getStackOverNum()))) {
+//                if ((StringUtils.isNotBlank((String) tr[1]) && Integer.parseInt(tr[1].toString()) > 0) && StringUtils.isNotBlank((String) tr[4]) && ((tr[6] != null && Integer.parseInt(tr[6].toString()) > 0))) {
+                if ((tr[6] != null && Integer.parseInt(tr[6].toString()) > 0) && checkGroupsSet.contains(tr[0])) {
                     list.add(tr);
                 }
             }
@@ -205,7 +211,7 @@ public class ConsumerService extends AbstractService {
             }
         }
         for(String key : overStackMap.keySet()){
-            if(overStackMap.get(key) == 0){
+            if(overStackMap.get(key) < configureInitializer.getStackOverNum()){
                 overStackMap.remove(key);
             }
         }
