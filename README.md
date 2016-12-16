@@ -1,9 +1,7 @@
 RocketMQ Console
 ================
 
-为RocketMQ提供web控制台
-
-
+为RocketMQ提供web控制台,实现了根据配置发送短信预警
 Note
 ================
 
