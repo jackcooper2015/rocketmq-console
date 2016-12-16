@@ -25,15 +25,15 @@
 
 	<bean id="configureInitializer" class="com.alibaba.rocketmq.config.ConfigureInitializer" init-method="init">
 		<property name="namesrvAddr" value="${rocketmq.namesrv.addr}" />
-        <property name="emailHost" value="${EMAIL_HOST}"/>
+<!--        <property name="emailHost" value="${EMAIL_HOST}"/>
         <property name="emailPassword" value="${EMAIL_HOST_PASSWORD}"/>
         <property name="emailUser" value="${EMAIL_HOST_USER}"/>
         <property name="emailPort" value="${EMAIL_PORT}"/>
         <property name="fromEmail" value="${DEFAULT_FROM_EMAIL}"/>
         <property name="emailReceiver" value="${DEFAULT_TO_EMAIL}"/>
         <property name="emailMonitorOn" value="${EMAIL_MONITOR_ON}"/>
+        <property name="domain" value="${domain}"/>-->
         <property name="stackOverNum" value="${stack.over.nums}" />
-        <property name="domain" value="${domain}"/>
         <property name="smsUrl" value="${SMS_URL}"/>
         <property name="smsUserName" value="${SMS_USER_NAME}"/>
         <property name="smsPassword" value="${SMS_PASSWORD}"/>
@@ -41,8 +41,8 @@
         <property name="smsChannelid" value="${SMS_CHANNELID}"/>
         <property name="monitorGroupNames" value="${MONITOR_GROUP_NAMES}"/>
 
-		<property name="alarmOnePeriodSeconds" value="${alarm.one.period.seconds}"/>
-		<property name="alarmMaxSendTimesInOnePeriod" value="${alarm.send.times.one.period}"/>
+		<!--<property name="alarmOnePeriodSeconds" value="${alarm.one.period.seconds}"/>-->
+		<!--<property name="alarmMaxSendTimesInOnePeriod" value="${alarm.send.times.one.period}"/>-->
 	</bean>
 
 	<bean id="cmdValidator" class="com.alibaba.rocketmq.validate.CmdValidator">

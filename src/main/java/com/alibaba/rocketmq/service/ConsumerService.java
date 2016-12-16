@@ -142,8 +142,8 @@ public class ConsumerService extends AbstractService {
     /**
      * 每30分钟检测一次 堆积
      */
-//    @Scheduled(fixedDelay = 30 * 60 * 1000)
-    @Scheduled(fixedDelay = 10 * 1000)
+    @Scheduled(fixedDelay = 5 * 60 * 1000)
+//    @Scheduled(fixedDelay = 10 * 1000)
     public void checkTopicStactOver(){
         String[] checkGroups = (configureInitializer.getMonitorGroupNames() == null ? "" : configureInitializer.getMonitorGroupNames()).split(",");
         Set checkGroupsSet = new HashSet();
