@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="
+           http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd
+       "
+	default-autowire="byName">
+
+	<context:property-placeholder location="classpath:config.properties" />
+	<context:annotation-config />
+
+    <!-- 定时器开关 -->
+    <task:annotation-driven executor="proExecutor"
+                            scheduler="proScheduler"/>
+    <task:executor id="proExecutor" pool-size="5"/>
+    <task:scheduler id="proScheduler" pool-size="10"/>
+
+	<!-- 使用annotation 自动注册bean,并检查@Required,@Autowired的属性已被注入 -->
+	<context:component-scan base-package="com.alibaba.rocketmq">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+
+	<bean id="configureInitializer" class="com.alibaba.rocketmq.config.ConfigureInitializer" init-method="init">
+		<property name="namesrvAddr" value="${rocketmq.namesrv.addr}" />
+        <property name="emailHost" value="${EMAIL_HOST}"/>
+        <property name="emailPassword" value="${EMAIL_HOST_PASSWORD}"/>
+        <property name="emailUser" value="${EMAIL_HOST_USER}"/>
+        <property name="emailPort" value="${EMAIL_PORT}"/>
+        <property name="fromEmail" value="${DEFAULT_FROM_EMAIL}"/>
+        <property name="emailReceiver" value="${DEFAULT_TO_EMAIL}"/>
+        <property name="emailMonitorOn" value="${EMAIL_MONITOR_ON}"/>
+        <property name="stackOverNum" value="${stack.over.nums}" />
+        <property name="domain" value="${domain}"/>
+        <property name="smsUrl" value="${SMS_URL}"/>
+        <property name="smsUserName" value="${SMS_USER_NAME}"/>
+        <property name="smsPassword" value="${SMS_PASSWORD}"/>
+        <property name="smsNotifyPhones" value="${SMS_NOTIFY_PHONES}"/>
+        <property name="smsChannelid" value="${SMS_CHANNELID}"/>
+        <property name="monitorGroupNames" value="${MONITOR_GROUP_NAMES}"/>
+
+		<property name="alarmOnePeriodSeconds" value="${alarm.one.period.seconds}"/>
+		<property name="alarmMaxSendTimesInOnePeriod" value="${alarm.send.times.one.period}"/>
+	</bean>
+
+	<bean id="cmdValidator" class="com.alibaba.rocketmq.validate.CmdValidator">
+		<property name="throwDone" value="${throwDone}" />
+	</bean>
+</beans>
