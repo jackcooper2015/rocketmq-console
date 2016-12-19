@@ -34,6 +34,8 @@ import com.alibaba.rocketmq.tools.command.consumer.UpdateSubGroupSubCommand;
 import com.alibaba.rocketmq.validate.CmdTrace;
 import sun.net.www.http.HttpClient;
 
+import javax.annotation.PostConstruct;
+
 
 /**
  * 
@@ -50,9 +52,26 @@ public class ConsumerService extends AbstractService {
     @Autowired
     private CacheManager cacheManager;
 
+    private static String[] checkGroups;
+
+    private static Map<String,Integer> topicOverNumMap = new HashMap<String, Integer>();
+
     static final ConsumerProgressSubCommand consumerProgressSubCommand = new ConsumerProgressSubCommand();
 
+    @PostConstruct
+    private void init(){
+        checkGroups = (configureInitializer.getMonitorGroupNames() == null ? "" : configureInitializer.getMonitorGroupNames()).split(",");
+        String topicOverNumStr = configureInitializer.getTopicOvernums() == null ? "":configureInitializer.getTopicOvernums() ;
+        topicOverNumStr= topicOverNumStr.replaceAll("：",":").replaceAll("；",";");
+        String[] topicOvers = topicOverNumStr.split(";");
+        for(String temp : topicOvers){
+            String[]  t = temp.split(":");
+            if(t.length == 2){
+                topicOverNumMap.put(t[0],Integer.parseInt(t[1]));
+            }
+        }
 
+    }
 
 
     public Collection<Option> getOptionsForConsumerProgress() {
@@ -107,11 +126,12 @@ public class ConsumerService extends AbstractService {
      * @param overStackMap
      */
     private void sendStackOverMsg(Map<String,Long> overStackMap) {
-        String title = "RocketMQ消息堆积（阈值："+configureInitializer.getStackOverNum()+"）报警:";
+        String title = "RocketMQ消息堆积报警:";
         StringBuffer contentBuffer = new StringBuffer();
         for(String key : overStackMap.keySet()){
             contentBuffer.append("\t主题" + key);
-            contentBuffer.append("数量：");
+            contentBuffer.append("阈值" + (topicOverNumMap.containsKey(key)?topicOverNumMap.get(key):configureInitializer.getStackOverNum()));
+            contentBuffer.append("拥堵数量：");
             contentBuffer.append(overStackMap.get(key));
         }
         //使用字符串的MD5值作为缓存键
@@ -145,7 +165,7 @@ public class ConsumerService extends AbstractService {
     @Scheduled(fixedDelay = 5 * 60 * 1000)
 //    @Scheduled(fixedDelay = 10 * 1000)
     public void checkTopicStactOver(){
-        String[] checkGroups = (configureInitializer.getMonitorGroupNames() == null ? "" : configureInitializer.getMonitorGroupNames()).split(",");
+
         Set checkGroupsSet = new HashSet();
         Collections.addAll(checkGroupsSet,checkGroups);
 
@@ -211,8 +231,14 @@ public class ConsumerService extends AbstractService {
             }
         }
         for(String key : overStackMap.keySet()){
-            if(overStackMap.get(key) < configureInitializer.getStackOverNum()){
-                overStackMap.remove(key);
+            if(topicOverNumMap.containsKey(key)){
+                if (overStackMap.get(key) < topicOverNumMap.get(key)) {
+                    overStackMap.remove(key);
+                }
+            }else {
+                if (overStackMap.get(key) < configureInitializer.getStackOverNum()) {
+                    overStackMap.remove(key);
+                }
             }
         }
         if(overStackMap.size()>0){

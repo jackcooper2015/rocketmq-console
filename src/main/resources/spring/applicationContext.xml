@@ -34,6 +34,7 @@
         <property name="emailMonitorOn" value="${EMAIL_MONITOR_ON}"/>
         <property name="domain" value="${domain}"/>-->
         <property name="stackOverNum" value="${stack.over.nums}" />
+        <property name="topicOvernums" value="${TOPIC_OVERNUMS}" />
         <property name="smsUrl" value="${SMS_URL}"/>
         <property name="smsUserName" value="${SMS_USER_NAME}"/>
         <property name="smsPassword" value="${SMS_PASSWORD}"/>

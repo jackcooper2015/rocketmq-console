@@ -48,6 +48,16 @@ public class ConfigureInitializer {
 
     private String monitorGroupNames;
 
+    public String getTopicOvernums() {
+        return topicOvernums;
+    }
+
+    public void setTopicOvernums(String topicOvernums) {
+        this.topicOvernums = topicOvernums;
+    }
+
+    private String topicOvernums;
+
     public String getSmsUrl() {
         return smsUrl;
     }
