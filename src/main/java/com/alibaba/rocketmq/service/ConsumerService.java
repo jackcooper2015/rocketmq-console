@@ -149,6 +149,7 @@ public class ConsumerService extends AbstractService {
                 paramMap.put("channelId", configureInitializer.getSmsChannelid());
                 try {
                     String result = HttpClientUtil.post(url, paramMap);
+                    logger.info("【预警短信】接收人"+phone+"短信内容："+content);
                     logger.info("【短信预警结果】====================>：" + result);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -189,7 +190,7 @@ public class ConsumerService extends AbstractService {
                 Object[] tr = table.getTbodyData().get(i);
                 //记录超出积压阀值的消费组
 //                if ((StringUtils.isNotBlank((String) tr[1]) && Integer.parseInt(tr[1].toString()) > 0) && StringUtils.isNotBlank((String) tr[4]) && ((tr[6] != null && Integer.parseInt(tr[6].toString()) > 0))) {
-                if ((tr[6] != null && Integer.parseInt(tr[6].toString()) > 0) && checkGroupsSet.contains(tr[0])) {
+                if ((tr[6] != null /*&& Integer.parseInt(tr[6].toString()) > 0*/) && checkGroupsSet.contains(tr[0])) {
                     list.add(tr);
                 }
             }
@@ -231,6 +232,7 @@ public class ConsumerService extends AbstractService {
             }
         }
         for(String key : overStackMap.keySet()){
+            logger.info("【topic_trace】"+key+":"+overStackMap.get(key));
             if(topicOverNumMap.containsKey(key)){
                 if (overStackMap.get(key) < topicOverNumMap.get(key)) {
                     overStackMap.remove(key);
